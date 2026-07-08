@@ -8,12 +8,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev';
 
 const { seedDatabase } = require('../seed');
 
-router.get('/seed-test', async (req, res) => {
+router.get('/full-seed', async (req, res) => {
   try {
     await seedDatabase(true);
-    res.json({ success: true, message: 'Seed executed successfully' });
+    res.json({ success: true, message: 'Full seed executed successfully on live database' });
   } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message, stack: err.stack });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
