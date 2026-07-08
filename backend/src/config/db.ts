@@ -24,6 +24,10 @@ const connectDB = async () => {
       
       await mongoose.connect(memUri);
       console.log(`✅ MongoDB Connected to Local Memory Server!`);
+      
+      // Automatically seed the empty memory database
+      const { seedDatabase } = await import('../seed');
+      await seedDatabase(true);
     } catch (memError: any) {
       console.error(`Error starting memory server: ${memError.message}`);
       process.exit(1);

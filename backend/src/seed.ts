@@ -22,10 +22,12 @@ try {
   }
 } catch (err) {}
 
-async function seedDatabase() {
+export async function seedDatabase(skipConnection = false) {
   try {
-    await mongoose.connect(MONGO_URI);
-    console.log('Connected to MongoDB for seeding...');
+    if (!skipConnection && mongoose.connection.readyState !== 1) {
+      await mongoose.connect(MONGO_URI);
+      console.log('Connected to MongoDB for seeding...');
+    }
 
     // Clear existing collections
     await User.deleteMany({});
@@ -201,11 +203,13 @@ async function seedDatabase() {
     });
 
     console.log('Seed data successfully inserted!');
-    process.exit(0);
+    if (!skipConnection) process.exit(0);
   } catch (error) {
     console.error('Error seeding database:', error);
-    process.exit(1);
+    if (!skipConnection) process.exit(1);
   }
 }
 
-seedDatabase();
+if (require.main === module) {
+  seedDatabase();
+}
