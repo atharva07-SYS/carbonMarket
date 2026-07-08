@@ -10,7 +10,7 @@ import Marketplace from './models/Marketplace';
 import Transaction from './models/Transaction';
 import Certificate from './models/Certificate';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/carbontrust';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/carbonmarket';
 
 async function seedDatabase() {
   try {

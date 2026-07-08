@@ -28,7 +28,7 @@ const LandingPage: React.FC = () => {
       <nav className="relative z-10 flex justify-between items-center p-6 max-w-7xl mx-auto">
         <div className="flex items-center space-x-2">
           <Leaf className="text-forest h-8 w-8" />
-          <span className="font-serif text-2xl font-bold tracking-tight text-forest">CarbonTrust</span>
+          <span className="font-serif text-2xl font-bold tracking-tight text-forest">Carbon Market</span>
         </div>
         <div className="space-x-4">
           <Link to="/login" className="text-forest font-medium hover:text-opacity-80 transition-colors">Log In</Link>

@@ -13,7 +13,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/carbontrust';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/carbonmarket';
 
 app.use(cors());
 app.use(express.json());

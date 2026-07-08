@@ -1,6 +1,6 @@
-# CarbonTrust
+# Carbon Market
 
-CarbonTrust is an AI-powered carbon credit verification and marketplace platform connecting farmers/NGOs, verification authorities, and industry buyers.
+Carbon Market is an AI-powered carbon credit verification and marketplace platform connecting farmers/NGOs, verification authorities, and industry buyers.
 
 ## Prerequisites
 
