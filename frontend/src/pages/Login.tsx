@@ -88,6 +88,14 @@ const Login: React.FC = () => {
           <div className="text-center text-sm text-forest/80">
             Don't have an account? <Link to="/register" className="text-forest font-bold hover:underline">Register here</Link>
           </div>
+
+          <div className="mt-8 pt-6 border-t border-sage/20 text-xs text-forest/50 text-center space-y-1">
+            <p className="font-bold uppercase tracking-wider mb-2 text-forest/40">Demo Credentials</p>
+            <p>NGO: <span className="font-mono">ngo@global.org</span> / password123</p>
+            <p>Verifier: <span className="font-mono">verify@global.org</span> / password123</p>
+            <p>Buyer: <span className="font-mono">sustainability@techcorp.com</span> / password123</p>
+            <p>Farmer: <span className="font-mono">amit@farmer.com</span> / password123</p>
+          </div>
         </form>
       </motion.div>
     </div>
