@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: carbon-market-backend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        value: <your-mongodb-atlas-uri>

@@ -1,5 +1,6 @@
 import express from 'express';
 import multer from 'multer';
+import { authenticate } from '../middlewares/auth.middleware';
 import NgoProfile from '../models/NgoProfile';
 import Farmer from '../models/Farmer';
 import Land from '../models/Land';
@@ -8,9 +9,15 @@ import CarbonCredit from '../models/CarbonCredit';
 import Verification from '../models/Verification';
 import Marketplace from '../models/Marketplace';
 import Transaction from '../models/Transaction';
+import User from '../models/User';
+import bcrypt from 'bcrypt';
+
 import axios from 'axios';
 
 const router = express.Router();
+
+router.use(authenticate);
+
 const upload = multer({ dest: 'uploads/' });
 
 // Create NGO Profile
@@ -34,18 +41,43 @@ router.post('/profile', async (req: any, res: any) => {
 });
 
 // Add Farmer under NGO
-router.post('/farmers', async (req: any, res: any) => {
+router.post('/farmers', upload.single('document'), async (req: any, res: any) => {
   try {
+    if (!req.file) return res.status(400).json({ message: 'Identity document is required' });
+
     const { name, phone, village } = req.body;
     const ngo = await NgoProfile.findOne({ userId: req.user._id });
     if (!ngo) return res.status(404).json({ message: 'NGO not found' });
 
+    // Generate a default user account for the farmer to log in
+    // Real-world: send an SMS/email with a secure password link. Here we use a default.
+    const email = `${name.replace(/\s+/g, '').toLowerCase()}${Math.floor(Math.random()*1000)}@farmer.com`;
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash('password123', salt);
+
+    const user = await User.create({
+      name,
+      email,
+      passwordHash,
+      role: 'farmer',
+      phone
+    });
+
     const farmer = await Farmer.create({
+      userId: (user as any)._id,
       ngoId: ngo._id,
       name,
       phone,
       village
     });
+
+    // Create Document for the Farmer ID
+    await Document.create({
+      farmerId: farmer._id,
+      type: 'Identity Proof',
+      fileUrl: req.file.path
+    });
+
     res.status(201).json(farmer);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
@@ -66,8 +98,15 @@ router.delete('/farmers/:id', async (req: any, res: any) => {
 });
 
 // Register Land for a specific Farmer
-router.post('/farmers/:farmerId/land', async (req: any, res: any) => {
+router.post('/farmers/:farmerId/land', upload.fields([
+  { name: 'sevenTwelve', maxCount: 1 },
+  { name: 'proofOfOwner', maxCount: 1 }
+]), async (req: any, res: any) => {
   try {
+    if (!req.files || !req.files.sevenTwelve || !req.files.proofOfOwner) {
+      return res.status(400).json({ message: 'Both 7/12 Extract and Proof of Ownership are required' });
+    }
+
     const { area, location, coordinates, treeType, soilType } = req.body;
     const ngo = await NgoProfile.findOne({ userId: req.user._id });
     if (!ngo) return res.status(404).json({ message: 'NGO not found' });
@@ -75,14 +114,34 @@ router.post('/farmers/:farmerId/land', async (req: any, res: any) => {
     const farmer = await Farmer.findOne({ _id: req.params.farmerId, ngoId: ngo._id });
     if (!farmer) return res.status(404).json({ message: 'Farmer not found under this NGO' });
 
+    // Try parsing coordinates if it was sent as string via FormData
+    let parsedCoordinates = coordinates;
+    if (typeof coordinates === 'string') {
+      try { parsedCoordinates = JSON.parse(coordinates); } catch (e) {}
+    }
+
     const land = await Land.create({
       farmerId: farmer._id,
       area,
       location,
-      coordinates,
+      coordinates: parsedCoordinates,
       treeType,
       soilType
     });
+
+    // Create Documents for Land
+    await Document.create({
+      farmerId: farmer._id,
+      type: '7/12 Extract',
+      fileUrl: req.files.sevenTwelve[0].path
+    });
+
+    await Document.create({
+      farmerId: farmer._id,
+      type: 'Proof of Ownership',
+      fileUrl: req.files.proofOfOwner[0].path
+    });
+
     res.status(201).json(land);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
@@ -197,7 +256,7 @@ router.get('/dashboard', async (req: any, res: any) => {
     const ngo = await NgoProfile.findOne({ userId: req.user._id });
     if (!ngo) return res.status(404).json({ message: 'NGO profile not found' });
 
-    const farmers = await Farmer.find({ ngoId: ngo._id });
+    const farmers = await Farmer.find({ ngoId: ngo._id }).populate('userId', 'email');
     const farmerIds = farmers.map(f => f._id);
     
     const lands = await Land.find({ farmerId: { $in: farmerIds } });

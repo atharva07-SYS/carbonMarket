@@ -127,4 +127,23 @@ router.post('/purchase/:creditId', authenticate, async (req: any, res: any) => {
   }
 });
 
+// Buyer Dashboard (Purchased Credits & Certificates)
+router.get('/dashboard', authenticate, async (req: any, res: any) => {
+  try {
+    const transactions = await Transaction.find({ buyerId: req.user._id })
+      .populate('creditId')
+      .populate('farmerId', 'name village');
+      
+    const transactionIds = transactions.map(t => t._id);
+    const certificates = await Certificate.find({ transactionId: { $in: transactionIds } });
+
+    res.json({
+      transactions,
+      certificates
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
 export default router;
