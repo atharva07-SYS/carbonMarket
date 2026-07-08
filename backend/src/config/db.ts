@@ -12,13 +12,25 @@ const connectDB = async () => {
   try {
     const conn = await mongoose.connect(MONGO_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
+    
+    // Check if database needs seeding
+    const User = require('../models/User').default || require('../models/User');
+    const userCount = await User.countDocuments();
+    if (userCount === 0) {
+      console.log('Atlas database is empty. Seeding...');
+      const { seedDatabase } = await import('../seed');
+      await seedDatabase(true);
+    }
   } catch (error: any) {
     console.log(`Atlas connection failed (${error.message}).`);
     console.log(`Falling back to local in-memory database to bypass network restrictions...`);
     try {
       const mongoServer = await MongoMemoryServer.create({
         instance: {
-          args: ['--wiredTigerCacheSizeGB=0.25'] // Minimum allowed is 256MB
+          args: [
+            '--wiredTigerCacheSizeGB=0.25',
+            '--nojournal'
+          ] // Minimum allowed is 256MB, disable journaling to save RAM
         }
       });
       const memUri = mongoServer.getUri();
