@@ -7,6 +7,7 @@ export interface IFarmer extends Document {
   phone?: string;
   village?: string;
   joinedDate: Date;
+  investmentAmount?: number;
 }
 
 const FarmerSchema: Schema = new Schema({
@@ -16,6 +17,7 @@ const FarmerSchema: Schema = new Schema({
   phone: { type: String },
   village: { type: String },
   joinedDate: { type: Date, default: Date.now },
+  investmentAmount: { type: Number, default: 0 },
 });
 
 export default mongoose.model<IFarmer>('Farmer', FarmerSchema);

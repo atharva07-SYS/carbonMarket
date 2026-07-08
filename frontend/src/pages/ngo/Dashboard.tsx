@@ -11,7 +11,7 @@ export default function NgoDashboard() {
   const [activeTab, setActiveTab] = useState('farmers'); // 'farmers' or 'add_farmer'
   
   // New Farmer Form
-  const [newFarmer, setNewFarmer] = useState({ name: '', phone: '', village: '' });
+  const [newFarmer, setNewFarmer] = useState({ name: '', phone: '', village: '', investmentAmount: '' });
   const [farmerDoc, setFarmerDoc] = useState<File | null>(null);
   
   // New Land Form
@@ -50,6 +50,7 @@ export default function NgoDashboard() {
       formData.append('name', newFarmer.name);
       formData.append('phone', newFarmer.phone);
       formData.append('village', newFarmer.village);
+      formData.append('investmentAmount', newFarmer.investmentAmount || '0');
       formData.append('document', farmerDoc);
 
       await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ngo/farmers`, formData, {
@@ -58,7 +59,7 @@ export default function NgoDashboard() {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setNewFarmer({ name: '', phone: '', village: '' });
+      setNewFarmer({ name: '', phone: '', village: '', investmentAmount: '' });
       setFarmerDoc(null);
       setActiveTab('farmers');
       fetchDashboard();
@@ -177,6 +178,10 @@ export default function NgoDashboard() {
                 <input type="text" required value={newFarmer.village} onChange={e => setNewFarmer({...newFarmer, village: e.target.value})} className="w-full px-4 py-2 border border-sage/40 rounded-lg focus:border-forest outline-none" />
               </div>
               <div>
+                <label className="block text-sm font-medium text-forest mb-1">Total Investment (₹)</label>
+                <input type="number" required value={newFarmer.investmentAmount} onChange={e => setNewFarmer({...newFarmer, investmentAmount: e.target.value})} className="w-full px-4 py-2 border border-sage/40 rounded-lg focus:border-forest outline-none" placeholder="e.g. 50000" />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-forest mb-1">Identity Document (PDF/Image)</label>
                 <input type="file" required onChange={e => setFarmerDoc(e.target.files?.[0] || null)} className="w-full px-4 py-2 border border-sage/40 rounded-lg focus:border-forest outline-none" />
               </div>
@@ -201,6 +206,7 @@ export default function NgoDashboard() {
                       <div>
                         <h3 className="text-2xl font-bold text-forest">{farmer.name}</h3>
                         <p className="text-forest/70 mb-1">{farmer.village} {farmer.phone && `| ${farmer.phone}`}</p>
+                        <p className="text-forest/90 font-medium mb-3">Farm Investment: <span className="text-forest font-bold">₹{farmer.investmentAmount?.toLocaleString() || '0'}</span></p>
                         {farmer.userId && farmer.userId.email && (
                           <div className="text-sm bg-sage/20 text-forest px-3 py-1 rounded inline-block font-medium">
                             Login ID: {farmer.userId.email} <span className="text-forest/50 font-normal ml-2">(Default Pass: password123)</span>

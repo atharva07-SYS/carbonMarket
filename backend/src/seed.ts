@@ -82,10 +82,10 @@ export async function seedDatabase(skipConnection = false) {
 
     // 3. Create Farmers
     const farmers = await Farmer.insertMany([
-      { userId: realFarmers[0]._id, ngoId: ngoProfile._id, name: 'Amit Patil', phone: '9876543210', village: 'Kolhapur' },
-      { userId: realFarmers[1]._id, ngoId: ngoProfile._id, name: 'Ramesh Singh', phone: '8765432109', village: 'Sangli' },
-      { userId: realFarmers[2]._id, ngoId: ngoProfile._id, name: 'Suresh Kumar', phone: '7654321098', village: 'Satara' },
-      { userId: realFarmers[3]._id, ngoId: ngoProfile._id, name: 'Vijay Jadhav', phone: '6543210987', village: 'Pune Rural' }
+      { userId: realFarmers[0]._id, ngoId: ngoProfile._id, name: 'Amit Patil', phone: '9876543210', village: 'Kolhapur', investmentAmount: 50000 },
+      { userId: realFarmers[1]._id, ngoId: ngoProfile._id, name: 'Ramesh Singh', phone: '8765432109', village: 'Sangli', investmentAmount: 25000 },
+      { userId: realFarmers[2]._id, ngoId: ngoProfile._id, name: 'Suresh Kumar', phone: '7654321098', village: 'Satara', investmentAmount: 75000 },
+      { userId: realFarmers[3]._id, ngoId: ngoProfile._id, name: 'Vijay Jadhav', phone: '6543210987', village: 'Pune Rural', investmentAmount: 40000 }
     ]);
 
     // 4. Create Land Parcels

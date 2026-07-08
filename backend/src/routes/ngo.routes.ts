@@ -45,7 +45,7 @@ router.post('/farmers', upload.single('document'), async (req: any, res: any) =>
   try {
     if (!req.file) return res.status(400).json({ message: 'Identity document is required' });
 
-    const { name, phone, village } = req.body;
+    const { name, phone, village, investmentAmount } = req.body;
     const ngo = await NgoProfile.findOne({ userId: req.user._id });
     if (!ngo) return res.status(404).json({ message: 'NGO not found' });
 
@@ -68,7 +68,8 @@ router.post('/farmers', upload.single('document'), async (req: any, res: any) =>
       ngoId: ngo._id,
       name,
       phone,
-      village
+      village,
+      investmentAmount: investmentAmount ? Number(investmentAmount) : 0
     });
 
     // Create Document for the Farmer ID
