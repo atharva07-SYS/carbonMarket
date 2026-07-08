@@ -3,7 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
-  allowedRoles?: Array<'farmer' | 'verifier' | 'buyer'>;
+  allowedRoles?: Array<'farmer' | 'verifier' | 'buyer' | 'ngo'>;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {

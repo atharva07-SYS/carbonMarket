@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Users, Map, Trash2, Leaf, ShieldAlert } from 'lucide-react';
 import axios from 'axios';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from 'react-router-dom';
 
 export default function NgoDashboard() {
@@ -12,10 +12,13 @@ export default function NgoDashboard() {
   
   // New Farmer Form
   const [newFarmer, setNewFarmer] = useState({ name: '', phone: '', village: '' });
+  const [farmerDoc, setFarmerDoc] = useState<File | null>(null);
   
   // New Land Form
   const [selectedFarmerId, setSelectedFarmerId] = useState<string | null>(null);
   const [newLand, setNewLand] = useState({ area: '', location: '', treeType: '', soilType: '' });
+  const [sevenTwelveDoc, setSevenTwelveDoc] = useState<File | null>(null);
+  const [proofOfOwnerDoc, setProofOfOwnerDoc] = useState<File | null>(null);
 
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -26,7 +29,7 @@ export default function NgoDashboard() {
 
   const fetchDashboard = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/ngo/dashboard', {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ngo/dashboard`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setData(res.data);
@@ -41,11 +44,22 @@ export default function NgoDashboard() {
 
   const handleAddFarmer = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!farmerDoc) { alert('Identity document is required'); return; }
     try {
-      await axios.post('http://localhost:5000/api/ngo/farmers', newFarmer, {
-        headers: { Authorization: `Bearer ${token}` }
+      const formData = new FormData();
+      formData.append('name', newFarmer.name);
+      formData.append('phone', newFarmer.phone);
+      formData.append('village', newFarmer.village);
+      formData.append('document', farmerDoc);
+
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ngo/farmers`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
       });
       setNewFarmer({ name: '', phone: '', village: '' });
+      setFarmerDoc(null);
       setActiveTab('farmers');
       fetchDashboard();
     } catch (err) {
@@ -56,7 +70,7 @@ export default function NgoDashboard() {
   const handleDeleteFarmer = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this farmer and all their land data?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/ngo/farmers/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ngo/farmers/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchDashboard();
@@ -68,15 +82,26 @@ export default function NgoDashboard() {
   const handleAddLand = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFarmerId) return;
+    if (!sevenTwelveDoc || !proofOfOwnerDoc) { alert('Both 7/12 Extract and Proof of Ownership are required'); return; }
     try {
-      await axios.post(`http://localhost:5000/api/ngo/farmers/${selectedFarmerId}/land`, {
-        ...newLand,
-        area: Number(newLand.area),
-        coordinates: [[0,0], [0,1], [1,1], [1,0]] // Dummy coords for now
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
+      const formData = new FormData();
+      formData.append('area', newLand.area);
+      formData.append('location', newLand.location);
+      formData.append('treeType', newLand.treeType);
+      formData.append('soilType', newLand.soilType);
+      formData.append('coordinates', JSON.stringify([[0,0], [0,1], [1,1], [1,0]]));
+      formData.append('sevenTwelve', sevenTwelveDoc);
+      formData.append('proofOfOwner', proofOfOwnerDoc);
+
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ngo/farmers/${selectedFarmerId}/land`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
       });
       setNewLand({ area: '', location: '', treeType: '', soilType: '' });
+      setSevenTwelveDoc(null);
+      setProofOfOwnerDoc(null);
       setSelectedFarmerId(null);
       fetchDashboard();
     } catch (err) {
@@ -87,7 +112,7 @@ export default function NgoDashboard() {
   const handleDeleteLand = async (id: string) => {
     if (!window.confirm('Delete this land parcel?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/ngo/land/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ngo/land/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchDashboard();
@@ -100,8 +125,13 @@ export default function NgoDashboard() {
   if (!data) return <div className="pt-32 text-center">Error loading dashboard</div>;
 
   return (
-    <div className="min-h-screen bg-cream pt-32 pb-20 px-4">
+    <div className="min-h-screen bg-cream pt-10 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
+        <div className="flex items-center space-x-3 mb-10">
+          <Leaf className="w-8 h-8 text-forest" />
+          <span className="text-2xl font-bold font-serif text-forest tracking-wide">EcoLedger</span>
+        </div>
+
         <div className="mb-12">
           <h1 className="text-4xl font-serif font-bold text-forest mb-2">NGO Dashboard</h1>
           <p className="text-xl text-forest/70">{data.ngo.organizationName} - {data.ngo.region}</p>
@@ -146,6 +176,10 @@ export default function NgoDashboard() {
                 <label className="block text-sm font-medium text-forest mb-1">Village/Town</label>
                 <input type="text" required value={newFarmer.village} onChange={e => setNewFarmer({...newFarmer, village: e.target.value})} className="w-full px-4 py-2 border border-sage/40 rounded-lg focus:border-forest outline-none" />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-forest mb-1">Identity Document (PDF/Image)</label>
+                <input type="file" required onChange={e => setFarmerDoc(e.target.files?.[0] || null)} className="w-full px-4 py-2 border border-sage/40 rounded-lg focus:border-forest outline-none" />
+              </div>
               <button type="submit" className="bg-forest text-cream px-6 py-3 rounded-lg font-bold w-full hover:bg-opacity-90">Add Farmer</button>
             </form>
           </motion.div>
@@ -166,7 +200,12 @@ export default function NgoDashboard() {
                     <div className="flex justify-between items-start mb-6 border-b border-sage/20 pb-4">
                       <div>
                         <h3 className="text-2xl font-bold text-forest">{farmer.name}</h3>
-                        <p className="text-forest/70">{farmer.village} {farmer.phone && `| ${farmer.phone}`}</p>
+                        <p className="text-forest/70 mb-1">{farmer.village} {farmer.phone && `| ${farmer.phone}`}</p>
+                        {farmer.userId && farmer.userId.email && (
+                          <div className="text-sm bg-sage/20 text-forest px-3 py-1 rounded inline-block font-medium">
+                            Login ID: {farmer.userId.email} <span className="text-forest/50 font-normal ml-2">(Default Pass: password123)</span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex space-x-3">
                         <button onClick={() => setSelectedFarmerId(farmer._id)} className="flex items-center text-sm font-medium bg-sage/20 text-forest px-4 py-2 rounded-lg hover:bg-sage/30">
@@ -199,9 +238,17 @@ export default function NgoDashboard() {
                             <label className="block text-xs font-bold uppercase text-forest/70 mb-1">Soil Type</label>
                             <input type="text" required value={newLand.soilType} onChange={e => setNewLand({...newLand, soilType: e.target.value})} className="w-full p-2 rounded border border-sage/40 outline-none" />
                           </div>
+                          <div>
+                            <label className="block text-xs font-bold uppercase text-forest/70 mb-1">7/12 Extract Document</label>
+                            <input type="file" required onChange={e => setSevenTwelveDoc(e.target.files?.[0] || null)} className="w-full p-2 rounded border border-sage/40 outline-none bg-white" />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold uppercase text-forest/70 mb-1">Proof of Ownership</label>
+                            <input type="file" required onChange={e => setProofOfOwnerDoc(e.target.files?.[0] || null)} className="w-full p-2 rounded border border-sage/40 outline-none bg-white" />
+                          </div>
                           <div className="md:col-span-2 flex space-x-3 mt-2">
                             <button type="submit" className="bg-forest text-cream px-6 py-2 rounded font-bold">Save Land</button>
-                            <button type="button" onClick={() => setSelectedFarmerId(null)} className="border border-forest/30 text-forest px-6 py-2 rounded font-bold">Cancel</button>
+                            <button type="button" onClick={() => { setSelectedFarmerId(null); setSevenTwelveDoc(null); setProofOfOwnerDoc(null); }} className="border border-forest/30 text-forest px-6 py-2 rounded font-bold">Cancel</button>
                           </div>
                         </form>
                       </div>

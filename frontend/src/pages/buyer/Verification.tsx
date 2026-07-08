@@ -19,7 +19,7 @@ const BuyerVerification: React.FC = () => {
 
   const checkStatus = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/buyer/status', {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/buyer/status`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data && res.data.status) {
@@ -36,7 +36,7 @@ const BuyerVerification: React.FC = () => {
     setError('');
     
     try {
-      await axios.post('http://localhost:5000/api/buyer/verify', formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/buyer/verify`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStatus('Pending');

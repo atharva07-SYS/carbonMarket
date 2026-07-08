@@ -7,6 +7,7 @@ import Marketplace from './pages/Marketplace';
 import NgoDashboard from './pages/ngo/Dashboard';
 import NgoRegistration from './pages/ngo/RegisterLand'; // This will be refactored
 import VerifierDashboard from './pages/verifier/Dashboard';
+import FarmerDashboard from './pages/farmer/Dashboard';
 import BuyerDashboard from './pages/buyer/Dashboard';
 import BuyerVerification from './pages/buyer/Verification';
 import { AuthProvider } from './contexts/AuthContext';
@@ -29,6 +30,10 @@ function App() {
 
             <Route element={<ProtectedRoute allowedRoles={['verifier']} />}>
               <Route path="/verifier/dashboard" element={<VerifierDashboard />} />
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={['farmer']} />}>
+              <Route path="/farmer/dashboard" element={<FarmerDashboard />} />
             </Route>
 
             <Route element={<ProtectedRoute allowedRoles={['buyer']} />}>

@@ -17,12 +17,12 @@ const VerifierDashboard: React.FC = () => {
 
   const fetchQueues = async () => {
     try {
-      const resProjects = await axios.get('http://localhost:5000/api/verifier/queue', {
+      const resProjects = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/verifier/queue`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProjectQueue(resProjects.data);
 
-      const resBuyers = await axios.get('http://localhost:5000/api/verifier/buyers', {
+      const resBuyers = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/verifier/buyers`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBuyerQueue(resBuyers.data);
@@ -40,7 +40,7 @@ const VerifierDashboard: React.FC = () => {
     }
 
     try {
-      await axios.post(`http://localhost:5000/api/verifier/review/${id}`, { decision, reason }, {
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/verifier/review/${id}`, { decision, reason }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchQueues();
@@ -51,7 +51,7 @@ const VerifierDashboard: React.FC = () => {
 
   const handleReviewBuyer = async (id: string, status: 'Verified' | 'Rejected') => {
     try {
-      await axios.post(`http://localhost:5000/api/verifier/buyers/${id}`, { status }, {
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/verifier/buyers/${id}`, { status }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchQueues();

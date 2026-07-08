@@ -35,7 +35,7 @@ const Marketplace: React.FC = () => {
 
   const fetchListings = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/buyer/marketplace');
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/buyer/marketplace`);
       setListings(res.data);
     } catch (err: any) {
       setError(err.message);
@@ -52,7 +52,7 @@ const Marketplace: React.FC = () => {
     
     setPurchasingId(creditId);
     try {
-      const res = await axios.post(`http://localhost:5000/api/buyer/purchase/${creditId}`, {}, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/buyer/purchase/${creditId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert(`Purchase successful! Certificate Hash: ${res.data.certificate.hash}`);
@@ -134,7 +134,7 @@ const Marketplace: React.FC = () => {
                   <button
                     onClick={() => handlePurchase(credit._id)}
                     disabled={purchasingId === credit._id}
-                    className="w-full bg-success text-cream py-5 rounded-xl font-bold text-xl uppercase tracking-wide hover:bg-opacity-90 transition-all transform hover:scale-[1.02] shadow-lg disabled:opacity-50 disabled:transform-none"
+                    className="w-full bg-forest text-cream py-5 rounded-xl font-bold text-xl uppercase tracking-wide hover:bg-opacity-90 transition-all transform hover:scale-[1.02] shadow-lg disabled:opacity-50 disabled:transform-none"
                   >
                     {purchasingId === credit._id ? 'Processing...' : 'Buy Carbon Credits'}
                   </button>

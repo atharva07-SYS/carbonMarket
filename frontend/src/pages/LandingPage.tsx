@@ -14,7 +14,7 @@ const LandingPage: React.FC = () => {
   const [stats, setStats] = useState<Stats>({ totalFarmers: 0, tonsCO2Verified: 0, totalRevenue: 0 });
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/public/stats')
+    axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/public/stats`)
       .then(res => setStats(res.data))
       .catch(console.error);
   }, []);

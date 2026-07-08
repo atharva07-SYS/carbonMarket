@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Building, MapPin, User, ShieldCheck } from 'lucide-react';
 import axios from 'axios';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const RegisterNgo: React.FC = () => {
@@ -21,7 +21,7 @@ const RegisterNgo: React.FC = () => {
   useEffect(() => {
     const checkProfile = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/ngo/dashboard', {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ngo/dashboard`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.ngo) {
@@ -40,7 +40,7 @@ const RegisterNgo: React.FC = () => {
     setError('');
 
     try {
-      await axios.post('http://localhost:5000/api/ngo/profile', formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/ngo/profile`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       navigate('/ngo/dashboard');
