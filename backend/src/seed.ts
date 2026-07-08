@@ -47,7 +47,7 @@ export async function seedDatabase(skipConnection = false) {
 
     // 1. Create Users (NGOs, Verifiers, Buyers)
     const farmerUsers = await User.insertMany([
-      { name: 'John Deere', email: 'john@farm.com', passwordHash, role: 'ngo', phone: '1234567890' },
+      { name: 'Global Earth NGO', email: 'ngo@global.org', passwordHash, role: 'ngo', phone: '1234567890' },
       { name: 'Sarah Fields', email: 'sarah@fields.org', passwordHash, role: 'ngo', phone: '0987654321' },
       { name: 'Green Earth NGO', email: 'contact@greenearth.org', passwordHash, role: 'ngo', phone: '1122334455' }
     ]);
