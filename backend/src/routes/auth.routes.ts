@@ -6,6 +6,17 @@ import User from '../models/User';
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-dev';
 
+const { seedDatabase } = require('../seed');
+
+router.get('/seed-test', async (req, res) => {
+  try {
+    await seedDatabase(true);
+    res.json({ success: true, message: 'Seed executed successfully' });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message, stack: err.stack });
+  }
+});
+
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role, phone } = req.body;
