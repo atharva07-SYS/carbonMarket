@@ -20,7 +20,8 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/login`, { email, password });
+      const trimmedEmail = email.trim();
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/login`, { email: trimmedEmail, password });
       login(res.data.user, res.data.token);
       
       switch (res.data.user.role) {
