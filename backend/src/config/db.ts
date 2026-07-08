@@ -18,7 +18,7 @@ const connectDB = async () => {
     try {
       const mongoServer = await MongoMemoryServer.create({
         instance: {
-          args: ['--wiredTigerCacheSizeGB=0.1'] // Limit RAM usage on Render
+          args: ['--wiredTigerCacheSizeGB=0.25'] // Minimum allowed is 256MB
         }
       });
       const memUri = mongoServer.getUri();
