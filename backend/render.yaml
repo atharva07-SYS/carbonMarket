@@ -8,4 +8,4 @@ services:
       - key: PORT
         value: 5000
       - key: MONGO_URI
-        value: <your-mongodb-atlas-uri>
+        value: mongodb+srv://20kidzzz26_db_user:CLtsOCODXpNCvVMP@cluster0.v5cleb2.mongodb.net/?appName=Cluster0
