@@ -1,0 +1,22 @@
+node_modules/
+.env
+dist/
+build/
+coverage/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Uploads
+uploads/
+backend/uploads/
