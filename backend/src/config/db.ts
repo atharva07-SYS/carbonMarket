@@ -16,7 +16,11 @@ const connectDB = async () => {
     console.log(`Atlas connection failed (${error.message}).`);
     console.log(`Falling back to local in-memory database to bypass network restrictions...`);
     try {
-      const mongoServer = await MongoMemoryServer.create();
+      const mongoServer = await MongoMemoryServer.create({
+        instance: {
+          args: ['--wiredTigerCacheSizeGB=0.1'] // Limit RAM usage on Render
+        }
+      });
       const memUri = mongoServer.getUri();
       
       // Save URI so other scripts (like seed.ts) can connect to this same memory DB
